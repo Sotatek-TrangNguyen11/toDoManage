@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>List of Todo</title>
+</head>
+<body>
+<h1>List of Todo</h1>
+<ul th:each="todo : ${todoList}">
+    <li >
+        <span th:text="*{todo.getTitle()}"></span>
+        <span>: </span>
+        <span th:text="*{todo.getDetail()}"></span>
+        <a href="/listTodo">xóa</a>
+        <a href="/updateTodo">sửa</a>
+    </li>
+</ul>
+</body>
+</html>
