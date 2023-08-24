@@ -1,20 +1,10 @@
 package me.example.toDoManage.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import me.example.toDoManage.model.ToDo;
+import me.example.toDoManage.model.entity.ToDo;
+import me.example.toDoManage.model.payload.TodoRes;
 import me.example.toDoManage.service.TodoService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,8 +18,13 @@ public class TodoController {
     private TodoService todoService;
 
     @GetMapping("/listTodo")
-    public List<ToDo> listTodo() {
+    public List<TodoRes> listTodo() {
         return todoService.findAll();
+    }
+
+    @GetMapping("/getTodo/{id}")
+    public ToDo getTodoById(@PathVariable("id") Long id) {
+        return todoService.findById(id);
     }
 
     @PostMapping("/addTodo")
@@ -38,13 +33,13 @@ public class TodoController {
     }
 
     @DeleteMapping("/deleteTodo/{id}")
-    public String deleteTodoPost(@PathVariable("id") Long id) {
+    public String deleteTodo(@PathVariable("id") Long id) {
         todoService.deleteById(id);
         return "Xóa thành công Todo vơi Id: " + id;
     }
 
     @PutMapping("/updateTodo")
-    public ToDo editTodoPost(@RequestBody ToDo toDo) {
+    public ToDo editTodo(@RequestBody ToDo toDo) {
         return todoService.update(toDo);
     }
 

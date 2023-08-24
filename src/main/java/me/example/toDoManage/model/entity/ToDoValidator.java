@@ -1,4 +1,4 @@
-package me.example.toDoManage.model;
+package me.example.toDoManage.model.entity;
 
 /*
 Đối tượng này dùng để kiểm tra xem một Object Todo có hợp lệ không

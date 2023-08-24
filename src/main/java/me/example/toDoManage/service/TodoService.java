@@ -1,11 +1,14 @@
 package me.example.toDoManage.service;
 
-import me.example.toDoManage.model.ToDo;
-import me.example.toDoManage.model.ToDoValidator;
+import me.example.toDoManage.model.entity.ToDo;
+import me.example.toDoManage.model.entity.ToDoValidator;
+import me.example.toDoManage.model.payload.TodoRes;
+import me.example.toDoManage.model.payload.UserRes;
 import me.example.toDoManage.repository.TodoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,8 +24,15 @@ public class TodoService {
      * Lấy ra danh sách các ToDo
      * @return
      */
-    public List<ToDo> findAll() {
-        return todoRepository.findAll();
+    public List<TodoRes> findAll() {
+        List<TodoRes> todoResList = new ArrayList<>();
+        for (ToDo toDo : todoRepository.findAll()) {
+            todoResList.add(
+                    new TodoRes(toDo.getId(), toDo.getTitle(), toDo.getDetail(), new UserRes(toDo.getUser().getId(), toDo.getUser().getUsername()))
+            );
+            System.out.println(todoResList.get(0));
+        }
+        return todoResList;
     }
 
     /**

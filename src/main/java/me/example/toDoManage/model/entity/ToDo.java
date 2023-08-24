@@ -1,7 +1,9 @@
-package me.example.toDoManage.model;
+package me.example.toDoManage.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Entity
 @Table(name = "todo")
@@ -14,6 +16,12 @@ public class ToDo {
 
     private String title;
     private String detail;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private User user;
 
     public ToDo() {
     }
@@ -46,5 +54,13 @@ public class ToDo {
 
     public void setDetail(String detail) {
         this.detail = detail;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
