@@ -18,6 +18,7 @@ import org.springframework.web.servlet.handler.UserRoleAuthorizationInterceptor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -58,16 +59,18 @@ public class UserService implements UserDetailsService {
      * @return
      */
     public ObjectRes addUser(User user) {
-        User userCheckId = userRepository.findById(user.getId()).get();
-        User userCheckUsername = userRepository.findByUsername(user.getUsername());
-        if (userCheckId != null) {
+        Optional<User> optionalUser = userRepository.findById(user.getId());
+        if (optionalUser.isPresent()) {
+            // Người dùng đã tồn tại
             return new ObjectRes(new StatusRes(StatusRes.STATUS_400, TodoAppProperties.validateRegisterUserId), null);
-        } else if (userCheckUsername != null) {
-            return new ObjectRes(new StatusRes(StatusRes.STATUS_400, TodoAppProperties.validateRegisterUserName), null);
         } else {
-            userRepository.save(user);
-            UserRes userRes = new UserRes(user.getId(), user.getUsername());
-            return new ObjectRes(new StatusRes(StatusRes.STATUS_200, TodoAppProperties.successAddUser), userRes);
+            if(checkUserName(user.getUsername())) {
+                return new ObjectRes(new StatusRes(StatusRes.STATUS_400, TodoAppProperties.validateRegisterUserName), null);
+            } else {
+                userRepository.save(user);
+                UserRes userRes = new UserRes(user.getId(), user.getUsername());
+                return new ObjectRes(new StatusRes(StatusRes.STATUS_200, TodoAppProperties.successAddUser), userRes);
+            }
         }
 
     }
@@ -95,16 +98,25 @@ public class UserService implements UserDetailsService {
      * @return
      */
     public ObjectRes login(User user) {
-        User userCheck = userRepository.findByUsername(user.getUsername());
-        // Kiểm tra xem người dùng có tồn tại hay không
-        if (userCheck == null)
+        if (!checkUserName(user.getUsername())) {
             return new ObjectRes(new StatusRes(StatusRes.STATUS_400, TodoAppProperties.failLogin), null);
-            // Kiểm tra xem mật khẩu có đúng hay không
-        else if (userCheck.getPassword().equals(user.getPassword()))
-            return new ObjectRes(new StatusRes(StatusRes.STATUS_400, TodoAppProperties.failPass), null);
-        else {
-            UserRes userRes = new UserRes(user.getId(), user.getUsername());
-            return new ObjectRes(new StatusRes(StatusRes.STATUS_200, TodoAppProperties.successLogin), userRes);
+        } else {
+            User userCheck = userRepository.findByUsername(user.getUsername());
+            if (userCheck.getPassword() == (user.getPassword())) {
+                return new ObjectRes(new StatusRes(StatusRes.STATUS_400, TodoAppProperties.failPass), null);
+            } else {
+                UserRes userRes = new UserRes(userCheck.getId(), userCheck.getUsername());
+                return new ObjectRes(new StatusRes(StatusRes.STATUS_200, TodoAppProperties.successLogin), userRes);
+            }
         }
+    }
+
+    public boolean checkUserName(String userName) {
+        for (User user : userRepository.findAll()) {
+            if (user.getUsername().equals(userName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

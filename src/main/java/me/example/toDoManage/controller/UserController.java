@@ -3,6 +3,7 @@ package me.example.toDoManage.controller;
 import lombok.AllArgsConstructor;
 import me.example.toDoManage.config.TodoAppProperties;
 import me.example.toDoManage.model.entity.User;
+import me.example.toDoManage.model.payload.LoginReq;
 import me.example.toDoManage.model.payload.ObjectRes;
 import me.example.toDoManage.model.payload.StatusRes;
 import me.example.toDoManage.model.payload.UserRes;
@@ -40,7 +41,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ObjectRes> login(@RequestBody User user) {
+    public ResponseEntity<ObjectRes> login(@RequestBody LoginReq loginReq) {
+        User user = new User(loginReq.getUsername(), loginReq.getPassword());
         ObjectRes objectRes = userService.login(user);
         if (objectRes.getStatus().getCode() == StatusRes.STATUS_200) {
             return ResponseEntity.ok(objectRes);
