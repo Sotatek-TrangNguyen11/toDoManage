@@ -1,7 +1,10 @@
 package me.example.toDoManage.service;
 
+import me.example.toDoManage.config.TodoAppProperties;
 import me.example.toDoManage.model.entity.ToDo;
 import me.example.toDoManage.model.entity.ToDoValidator;
+import me.example.toDoManage.model.payload.ObjectRes;
+import me.example.toDoManage.model.payload.StatusRes;
 import me.example.toDoManage.model.payload.TodoRes;
 import me.example.toDoManage.model.payload.UserRes;
 import me.example.toDoManage.repository.TodoRepository;
@@ -24,15 +27,17 @@ public class TodoService {
      * Lấy ra danh sách các ToDo
      * @return
      */
-    public List<TodoRes> findAll() {
+    public ObjectRes findAll() {
         List<TodoRes> todoResList = new ArrayList<>();
-        for (ToDo toDo : todoRepository.findAll()) {
-            todoResList.add(
-                    new TodoRes(toDo.getId(), toDo.getTitle(), toDo.getDetail(), new UserRes(toDo.getUser().getId(), toDo.getUser().getUsername()))
-            );
-            System.out.println(todoResList.get(0));
+        if (todoRepository.findAll() == null) {
+            ObjectRes objectRes = new ObjectRes(new StatusRes(StatusRes.STATUS_404, TodoAppProperties.failGetAllTodo), null);
+            return objectRes;
         }
-        return todoResList;
+        for (ToDo toDo : todoRepository.findAll()) {
+            TodoRes todoRes = new TodoRes(toDo.getId(), toDo.getTitle(), toDo.getDetail(), toDo.getUser().getUsername());
+            todoResList.add(todoRes);
+        }
+        return new ObjectRes(new StatusRes(StatusRes.STATUS_200, TodoAppProperties.successGetAllTodo), todoResList);
     }
 
     /**
@@ -40,8 +45,14 @@ public class TodoService {
      * @param id
      * @return
      */
-    public ToDo findById(Long id) {
-        return todoRepository.findById(id).orElse(null);
+    public ObjectRes findById(Long id) {
+        if (todoRepository.findById(id) == null)
+            return new ObjectRes(new StatusRes(StatusRes.STATUS_404, TodoAppProperties.failGetTodoById), null);
+        else {
+            ToDo toDo = todoRepository.findById(id).get();
+            TodoRes todoRes = new TodoRes(toDo.getId(), toDo.getTitle(), toDo.getDetail(), toDo.getUser().getUsername());
+            return new ObjectRes(new StatusRes(StatusRes.STATUS_200, TodoAppProperties.successGetTodoById), todoRes);
+        }
     }
 
     /**
@@ -49,19 +60,26 @@ public class TodoService {
      * @param toDo
      * @return
      */
-    public ToDo add(ToDo toDo) {
+    public ObjectRes add(ToDo toDo) {
         if (toDoValidator.isValid(toDo)) {
-            return todoRepository.save(toDo);
+            todoRepository.save(toDo);
+            TodoRes todoRes = new TodoRes(toDo.getId(), toDo.getTitle(), toDo.getDetail(), toDo.getUser().getUsername());
+            return new ObjectRes(new StatusRes(StatusRes.STATUS_200, TodoAppProperties.successAddTodo), todoRes);
         }
-        return null;
+        return new ObjectRes(new StatusRes(StatusRes.STATUS_400, TodoAppProperties.failAddTodo), null);
     }
 
     /**
      * Xóa một ToDo
      * @param id
      */
-    public void deleteById(Long id) {
+    public ObjectRes deleteById(Long id) {
         todoRepository.deleteById(id);
+        if (todoRepository.findById(id).get() == null) {
+            return new ObjectRes(new StatusRes(StatusRes.STATUS_200, TodoAppProperties.successDeleteTodo), null);
+        } else {
+            return new ObjectRes(new StatusRes(StatusRes.STATUS_400, TodoAppProperties.failDeleteTodo), null);
+        }
     }
 
     /**
@@ -69,11 +87,13 @@ public class TodoService {
      * @param toDo
      * @return
      */
-    public ToDo update(ToDo toDo) {
+    public ObjectRes update(ToDo toDo) {
         if (toDoValidator.isValid(toDo)) {
-            return todoRepository.save(toDo);
+            todoRepository.save(toDo);
+            TodoRes todoRes = new TodoRes(toDo.getId(), toDo.getTitle(), toDo.getDetail(), toDo.getUser().getUsername());
+            return new ObjectRes(new StatusRes(StatusRes.STATUS_200, TodoAppProperties.successUpdateTodo), todoRes);
         }
-        return null;
+        return new ObjectRes(new StatusRes(StatusRes.STATUS_400, TodoAppProperties.failUpdateTodo), null);
     }
 
 }

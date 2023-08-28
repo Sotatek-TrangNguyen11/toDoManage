@@ -1,5 +1,7 @@
 package me.example.toDoManage.model.payload;
 
+import me.example.toDoManage.model.entity.User;
+
 public class UserRes {
     private Long id;
     private String username;

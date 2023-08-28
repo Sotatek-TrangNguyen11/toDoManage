@@ -4,13 +4,13 @@ public class TodoRes {
     private Long id;
     private String title;
     private String detail;
-    private UserRes user;
+    private String userName;
 
-    public TodoRes(Long id, String title, String detail, UserRes user) {
+    public TodoRes(Long id, String title, String detail, String userName) {
         this.id = id;
         this.title = title;
         this.detail = detail;
-        this.user = user;
+        this.userName = userName;
     }
 
     public Long getId() {
@@ -37,11 +37,11 @@ public class TodoRes {
         this.detail = detail;
     }
 
-    public UserRes getUser() {
-        return user;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setUser(UserRes user) {
-        this.user = user;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

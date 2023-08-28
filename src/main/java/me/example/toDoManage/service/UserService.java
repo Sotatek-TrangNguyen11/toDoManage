@@ -1,5 +1,10 @@
 package me.example.toDoManage.service;
 
+import me.example.toDoManage.config.TodoAppProperties;
+import me.example.toDoManage.model.entity.ToDo;
+import me.example.toDoManage.model.payload.ObjectRes;
+import me.example.toDoManage.model.payload.StatusRes;
+import me.example.toDoManage.model.payload.TodoRes;
 import me.example.toDoManage.model.payload.UserRes;
 import me.example.toDoManage.security.CustomUserDetails;
 import me.example.toDoManage.model.entity.User;
@@ -8,11 +13,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.handler.UserRoleAuthorizationInterceptor;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
 public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
+
+    /**
+     * Lấy người dùng qua username
+     * @param username
+     * @return
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);
@@ -21,6 +38,12 @@ public class UserService implements UserDetailsService {
         }
         return new CustomUserDetails(user);
     }
+
+    /**
+     * lấy người dùng qua id
+     * @param id
+     * @return
+     */
     public UserDetails loadUserById(Long id) {
         User user = userRepository.findById(id).get();
         if (user == null) {
@@ -29,18 +52,59 @@ public class UserService implements UserDetailsService {
         return new CustomUserDetails(user);
     }
 
-    public String addUser(User user) {
+    /**
+     * Thêm người dùng
+     * @param user
+     * @return
+     */
+    public ObjectRes addUser(User user) {
         User userCheckId = userRepository.findById(user.getId()).get();
         User userCheckUsername = userRepository.findByUsername(user.getUsername());
         if (userCheckId != null) {
-            return "Người dùng đã tồn tại";
+            return new ObjectRes(new StatusRes(StatusRes.STATUS_400, TodoAppProperties.validateRegisterUserId), null);
         } else if (userCheckUsername != null) {
-            return "Tên đăng nhập đã tồn tại";
+            return new ObjectRes(new StatusRes(StatusRes.STATUS_400, TodoAppProperties.validateRegisterUserName), null);
         } else {
             userRepository.save(user);
             UserRes userRes = new UserRes(user.getId(), user.getUsername());
-            return "Thêm người dùng thành công";
+            return new ObjectRes(new StatusRes(StatusRes.STATUS_200, TodoAppProperties.successAddUser), userRes);
         }
 
+    }
+
+    /**
+     * Trả về danh sách tất cả người dùng
+     * @param
+     * @return
+     */
+    public ObjectRes getAllUser() {
+        List<UserRes> userResList = new ArrayList<>();
+        if (userRepository.findAll() == null) {
+            return new ObjectRes(new StatusRes(StatusRes.STATUS_404, TodoAppProperties.successGetAllUser), null);
+        }
+        for (User user : userRepository.findAll()) {
+            UserRes userRes = new UserRes(user.getId(), user.getUsername());
+            userResList.add(userRes);
+        }
+        return new ObjectRes(new StatusRes(StatusRes.STATUS_200, TodoAppProperties.successGetAllUser), userResList);
+    }
+
+    /**
+     * Đăng nhập
+     * @param user
+     * @return
+     */
+    public ObjectRes login(User user) {
+        User userCheck = userRepository.findByUsername(user.getUsername());
+        // Kiểm tra xem người dùng có tồn tại hay không
+        if (userCheck == null)
+            return new ObjectRes(new StatusRes(StatusRes.STATUS_400, TodoAppProperties.failLogin), null);
+            // Kiểm tra xem mật khẩu có đúng hay không
+        else if (userCheck.getPassword().equals(user.getPassword()))
+            return new ObjectRes(new StatusRes(StatusRes.STATUS_400, TodoAppProperties.failPass), null);
+        else {
+            UserRes userRes = new UserRes(user.getId(), user.getUsername());
+            return new ObjectRes(new StatusRes(StatusRes.STATUS_200, TodoAppProperties.successLogin), userRes);
+        }
     }
 }

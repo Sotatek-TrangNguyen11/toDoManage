@@ -18,12 +18,11 @@ public class ToDoManageApplication implements CommandLineRunner{
 		SpringApplication.run(ToDoManageApplication.class, args);
 	}
 
-	@Autowired
-	private TodoAppProperties todoAppProperties;
+//	@Autowired
+//	private TodoAppProperties todoAppProperties;
 
 	@Override
 	public void run(String... args) throws Exception {
 		System.out.println("Hello World");
-		System.out.println(todoAppProperties.name);
 	}
 }

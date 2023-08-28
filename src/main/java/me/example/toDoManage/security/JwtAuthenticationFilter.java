@@ -11,11 +11,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+// Lọc request để lấy jwt từ header
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -25,12 +27,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private UserService userService;
 
+    // Lọc request để lấy jwt từ header
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException{
         try {
             // Lấy jwt từ request
             String jwt = getJwtFromRequest(request);
 
+            // Validate jwt
             if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
                 // Lấy id từ chuỗi jwt
                 Long userid = jwtTokenProvider.getUserIdFromJwt(jwt);
@@ -42,6 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
+                    // Set thông tin authentication vào Security Context
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
@@ -49,6 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.error("failed on set user authentication", ex);
         }
 
+        // Cho phép request đi tiếp sang Filter tiếp theo
         filterChain.doFilter(request, response);
     }
 
@@ -61,5 +67,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
+
 
 }
