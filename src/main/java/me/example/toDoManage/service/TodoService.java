@@ -11,6 +11,7 @@ import me.example.toDoManage.repository.TodoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.awt.print.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,12 +29,14 @@ public class TodoService {
      * @return
      */
     public ObjectRes findAll() {
+        //Pageable
         List<TodoRes> todoResList = new ArrayList<>();
-        if (todoRepository.findAll() == null) {
+        List<ToDo> toDoList = todoRepository.findAll();
+        if (toDoList.isEmpty()) {
             ObjectRes objectRes = new ObjectRes(new StatusRes(StatusRes.STATUS_404, TodoAppProperties.failGetAllTodo), null);
             return objectRes;
         }
-        for (ToDo toDo : todoRepository.findAll()) {
+        for (ToDo toDo : toDoList) {
             TodoRes todoRes = new TodoRes(toDo.getId(), toDo.getTitle(), toDo.getDetail(), toDo.getUser().getUsername());
             todoResList.add(todoRes);
         }
@@ -46,6 +49,7 @@ public class TodoService {
      * @return
      */
     public ObjectRes findById(Long id) {
+//         Optional
         if (todoRepository.findById(id) == null)
             return new ObjectRes(new StatusRes(StatusRes.STATUS_404, TodoAppProperties.failGetTodoById), null);
         else {

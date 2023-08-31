@@ -6,13 +6,13 @@ import me.example.toDoManage.model.payload.ObjectRes;
 import me.example.toDoManage.model.payload.StatusRes;
 import me.example.toDoManage.model.payload.TodoRes;
 import me.example.toDoManage.model.payload.UserRes;
-import me.example.toDoManage.security.CustomUserDetails;
+//import me.example.toDoManage.security.CustomUserDetails;
 import me.example.toDoManage.model.entity.User;
 import me.example.toDoManage.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+//import org.springframework.security.core.userdetails.UserDetails;
+//import org.springframework.security.core.userdetails.UserDetailsService;
+//import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.handler.UserRoleAuthorizationInterceptor;
 
@@ -21,7 +21,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserService implements UserDetailsService {
+public class UserService
+//        implements UserDetailsService
+{
 
     @Autowired
     private UserRepository userRepository;
@@ -31,27 +33,27 @@ public class UserService implements UserDetailsService {
      * @param username
      * @return
      */
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException(username);
-        }
-        return new CustomUserDetails(user);
-    }
+//    @Override
+//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+//        User user = userRepository.findByUsername(username);
+//        if (user == null) {
+//            throw new UsernameNotFoundException(username);
+//        }
+//        return new CustomUserDetails(user);
+//    }
 
     /**
      * lấy người dùng qua id
      * @param id
      * @return
      */
-    public UserDetails loadUserById(Long id) {
-        User user = userRepository.findById(id).get();
-        if (user == null) {
-            throw new UsernameNotFoundException(id.toString());
-        }
-        return new CustomUserDetails(user);
-    }
+//    public UserDetails loadUserById(Long id) {
+//        User user = userRepository.findById(id).get();
+//        if (user == null) {
+//            throw new UsernameNotFoundException(id.toString());
+//        }
+//        return new CustomUserDetails(user);
+//    }
 
     /**
      * Thêm người dùng
