@@ -11,4 +11,3 @@ COPY src ./src
 #run this inside container
 CMD ["./mvnw", "spring-boot:run"]
 
-
